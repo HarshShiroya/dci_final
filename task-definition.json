@@ -1,33 +1,32 @@
 {
-    "family": "harsh-flask-app-task", 
+    "family": "harsh-flask-app-task",
     "networkMode": "awsvpc",
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "256", 
+    "cpu": "256",
     "memory": "512",
     "executionRoleArn": "arn:aws:iam::794038211044:role/harsh-ecs-execution-role",
     "containerDefinitions": [
         {
-            "name": "harsh-flask-ecs-cluster", 
-            "image": "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/flask-app-repo-harsh:placeholder", 
+            "name": "harsh-flask-container",
+            "image": "794038211044.dkr.ecr.us-east-1.amazonaws.com/flask-app-repo-harsh:placeholder",
             "portMappings": [
                 {
-                    "containerPort": 5000, 
+                    "containerPort": 5000,
                     "hostPort": 5000,
                     "protocol": "tcp"
                 }
             ],
             "essential": true,
-            "logConfiguration": { 
+            "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/harsh-api-task-def", 
+                    "awslogs-group": "/ecs/harsh-api-task-def",
                     "awslogs-region": "us-east-1",
                     "awslogs-stream-prefix": "ecs"
                 }
             }
-          
         }
     ]
 }
