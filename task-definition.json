@@ -1,0 +1,33 @@
+{
+    "family": "harsh-flask-app-task", 
+    "networkMode": "harsh-vpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256", 
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::794038211044:role/harsh-ecs-execution-role",
+    "containerDefinitions": [
+        {
+            "name": "harsh-flask-ecs-cluster", // <<< MUST MATCH CONTAINER_NAME in workflow
+            "image": "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/flask-app-repo-harsh:placeholder", // <<< This image URI will be replaced by the workflow
+            "portMappings": [
+                {
+                    "containerPort": 5000, 
+                    "hostPort": 5000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "logConfiguration": { // Optional, but recommended
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/harsh-api-task-def", // Create this log group or adjust name
+                    "awslogs-region": "us-east-1", // Replace with your region
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+          
+        }
+    ]
+}
