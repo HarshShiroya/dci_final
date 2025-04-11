@@ -56,7 +56,7 @@ jobs:
           echo "image=${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
       # --- Start: ECS Deployment Steps ---
-      - name: Download task definition template file from repository
+      # - name: Download task definition template file from repository
         # This step isn't strictly necessary if the file is checked out, but ensures it exists
         # run: echo "Using task definition file: ${{ env.ECS_TASK_DEFINITION_FILE }}"
 
