@@ -1,6 +1,6 @@
 {
     "family": "harsh-flask-app-task", 
-    "networkMode": "harsh-vpc",
+    "networkMode": "awsvpc",
     "requiresCompatibilities": [
         "FARGATE"
     ],
