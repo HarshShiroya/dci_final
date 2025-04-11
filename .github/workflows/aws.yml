@@ -8,11 +8,11 @@ on:
 env:
   # --- START: USER CONFIGURABLE VARIABLES ---
   AWS_REGION: us-east-1 # Your AWS region
-  ECR_REPOSITORY_URI: 794038211044.dkr.ecr.us-east-1.amazonaws.com/flask-app-repo-harsh # Full ECR Repository URI (as you had it)
+  ECR_REPOSITORY_URI: 794038211044.dkr.ecr.us-east-1.amazonaws.com/flask-app-repo-harsh # Full ECR Repository URI
   ECS_CLUSTER_NAME: harsh-flask-ecs-cluster  # Your ECS cluster name
   ECS_SERVICE_NAME: harsh-ecs-service  # Your ECS service name
   ECS_TASK_DEFINITION_FILE: task-definition.json # Relative path to the task definition file in your repository
-  CONTAINER_NAME: harsh-flask-ecs-cluster # The 'name' of the container defined inside task-definition.json
+  CONTAINER_NAME: harsh-flask-container # Use the logical container name
   DOCKER_BUILD_IMAGE_NAME: flask-app # The name used during the 'docker build -t' step
   # --- END: USER CONFIGURABLE VARIABLES ---
 
@@ -20,9 +20,11 @@ jobs:
   build-push-deploy: # Combined job name
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Configure AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2 # Using v2 is fine
         with:
@@ -30,13 +32,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Uses secret named AWS_SECRET_ACCESS_KEY
           aws-region: ${{ env.AWS_REGION }}
 
+      # Step 3: Build Docker image
       - name: Build Docker image
         run: docker build -t ${{ env.DOCKER_BUILD_IMAGE_NAME }} . # Use env var for consistency
 
+      # Step 4: Login to Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2 # Use v2
 
+      # Step 5: Tag and Push image to Amazon ECR
       - name: Tag and Push image to Amazon ECR
         id: build-image # Added id to easily reference image tag later if needed
         env:
@@ -56,18 +61,24 @@ jobs:
           echo "image=${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
       # --- Start: ECS Deployment Steps ---
-      # - name: Download task definition template file from repository
-        # This step isn't strictly necessary if the file is checked out, but ensures it exists
-        # run: echo "Using task definition file: ${{ env.ECS_TASK_DEFINITION_FILE }}"
 
+      # Step 6: Verify task definition file path (Optional Debug)
+      # Uncomment if needed to check if the file exists
+      # - name: Verify task definition file path
+      #   run: |
+      #     echo "Looking for task definition file at: ${{ env.ECS_TASK_DEFINITION_FILE }}"
+      #     ls -l ${{ env.ECS_TASK_DEFINITION_FILE }}
+
+      # Step 7: Render new task definition with updated image URI
       - name: Render new task definition with updated image URI
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION_FILE }} # Input file from repo
-          container-name: ${{ env.CONTAINER_NAME }} # Container name to update
+          container-name: ${{ env.CONTAINER_NAME }} # Container name to update (now corrected)
           image: ${{ steps.build-image.outputs.image }} # Image URI output from the build-image step
 
+      # Step 8: Deploy new task definition to ECS Service
       - name: Deploy new task definition to ECS Service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
