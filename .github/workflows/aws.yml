@@ -50,12 +50,12 @@ jobs:
           # Tag the locally built image with the ECR repository URI and commit SHA
           docker tag ${{ env.DOCKER_BUILD_IMAGE_NAME }}:latest ${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
           # Also tag as latest (optional, but common)
-          docker tag ${{ env.DOCKER_BUILD_IMAGE_NAME }}:latest ${{ env.ECR_REPOSITORY_URI }}:latest
+          # docker tag ${{ env.DOCKER_BUILD_IMAGE_NAME }}:latest ${{ env.ECR_REPOSITORY_URI }}:latest
 
           # Push the commit SHA tagged image to ECR
           docker push ${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
           # Push the 'latest' tagged image to ECR
-          docker push ${{ env.ECR_REPOSITORY_URI }}:latest
+          # docker push ${{ env.ECR_REPOSITORY_URI }}:latest
 
           # Set the output variable for the exact image pushed (commit SHA version)
           echo "image=${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
